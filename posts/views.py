@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Hashtag, Post, Comment
-
+from .forms import PostCreateForm, CommentCreateForm
 
 # Create your views here.
 def hashtags_view(request):
@@ -30,6 +30,49 @@ def post_detail_view(request, **kwargs):
         post = Post.objects.get(id=kwargs['id'])
         data = {
             'post': post,
-            'comments': Comment.objects.filter(post=post)
+            'comments': Comment.objects.filter(post=post),
+            'form': CommentCreateForm
         }
         return render(request, 'posts/post_detail.html', context=data)
+    if request.method == 'POST':
+        form = CommentCreateForm(data=request.POST)
+
+        if form.is_valid():
+            Comment.objects.create(
+                author_id=1,
+                text=form.cleaned_data.get('text'),
+                post_id=kwargs['id']
+            )
+            return redirect(f'/posts/{kwargs["id"]}/')
+        else:
+            post = Post.objects.get(id=kwargs['id'])
+            comments = Comment.objects.filter(post=post)
+
+            data = {
+                'post': post,
+                'comments': comments,
+                'form': form
+            }
+
+            return render(request, 'posts/post_detail.html', context=data)
+
+def post_create_view(request):
+    if request.method == 'GET':
+        data = {
+            'form': PostCreateForm
+        }
+        return render(request, 'posts/creat.html', context=data)
+    if request.method == 'POST':
+        form = PostCreateForm(data=request.POST)
+
+        if form.is_valid():
+            Post.objects.create(
+                title=form.cleaned_data.get('title'),
+                description=form.cleaned_data.get('description')
+            )
+            return redirect('/posts/')
+        else:
+            data = {
+                'form': form
+            }
+            return render(request, 'posts/creat.html', context=data)
