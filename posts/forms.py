@@ -6,3 +6,5 @@ class PostCreateForm(forms.Form):
 
 class CommentCreateForm(forms.Form):
     text = forms.CharField(max_length=255)
+
+    text = forms.CharField(max_length=255)
