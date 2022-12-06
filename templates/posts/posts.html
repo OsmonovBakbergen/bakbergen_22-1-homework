@@ -10,11 +10,10 @@
     </style>
     <div>
         <form action="/posts/" method="get">
-            {% if hashtag_id %}
-                <input type="hidden" name="hashtag_id" value="{{ hashtag_id }}">
+            {% if hastag_id %}
+                <input type="hidden" name="hashtag_id" value="{{ hastag_id }}">
             {% endif %}
             <input type="text" name="search" value="">
-            {% csrf_token %}
         </form>
     </div>
     <div class="hashtags">
@@ -29,7 +28,7 @@
     </div>
     <div>
         {% for page in max_page %}
-            <a href="/posts/?page={{ page }}{% if hashtag_id %}&hashtag_id={{ hashtag_id }}{% endif %}{% if search_text %}&search={{ search_text }}{% endif %}">
+        <a href="/posts/?page={{ page }}{% if hashtag_id %}&hashtag_id={{ hashtag_id }}{% endif %}{% if search_text %}&search={{ search_text }}{% endif %}">
                 <button style="width: 25px; height: 25px">{{ page }}</button>
             </a>
         {% endfor %}
