@@ -8,15 +8,29 @@ PAGINATIONS_LIMIT = 1
 
 
 
+
 class HashtagListView(generic.ListView):
+    model = Hashtag
     template_name = 'posts/hashtags.html'
     queryset = Hashtag.objects.all()
+    # def get_context_data(self, *, object_list=None, **kwargs):
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        return {
-            'hashtags': self.get_queryset(),
-            'user': get_user_from_request(self.request)
+    def get(self, request, *args, **kwargs):
+        context = {
+            'object_list': self.get_queryset(),
+            'user': get_user_from_request(request)
         }
+        return render(request, self.template_name, context=context)
+# class HashtagListView(generic.ListView):
+#     model = Hashtag
+#     template_name = 'hashtags/hashtags.html'
+#     queryset = Hashtag.objects.all()
+#
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         return {
+#             'hashtags': self.get_queryset(),
+#             'user': get_user_from_request(self.request)
+#         }
 
 class PostListVIew(generic.ListView):
     template_name = 'posts/posts.html'
@@ -34,8 +48,8 @@ class PostListVIew(generic.ListView):
         if search_text:
             posts = posts.filter(title__icontains=search_text)
 
-        max_page = round(posts.__len__() / PAGINATION_LIMIT)
-        posts = posts[PAGINATION_LIMIT * (page - 1): PAGINATION_LIMIT * page]
+        max_page = round(posts.__len__() / PAGINATIONS_LIMIT)
+        posts = posts[PAGINATIONS_LIMIT * (page - 1): PAGINATIONS_LIMIT * page]
         return {
             'posts': posts,
             'user': get_user_from_request(self.request),
@@ -60,8 +74,8 @@ class PostDetailView(generic.DetailView, generic.CreateView):
         }
 
 
-        def post(self, request, *args, **kwargs):
-            form = CommentCreateForm(data=request.POST)
+    def post(self, request, *args, **kwargs):
+        form = CommentCreateForm(data=request.POST)
 
         if form.is_valid():
             Comment.objects.create(
@@ -70,7 +84,7 @@ class PostDetailView(generic.DetailView, generic.CreateView):
                 post_id=self.get_object().id
             )
             return redirect(f'/posts/{self.get_object().id}/')
-            return render(request, self.template_name, context=self.get_context_data(form=form))
+        return render(request, self.template_name, context=self.get_context_data(form=form))
 
 
 class PostCreateView(generic.CreateView):
